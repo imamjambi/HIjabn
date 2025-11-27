@@ -92,7 +92,7 @@
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Toko Hijabina</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
     <!-- Sidebar -->
@@ -315,7 +315,7 @@
                     <div class="filter-row" style="grid-template-columns: 1fr;">
                         <div class="form-group">
                             <label for="reportPeriod">Pilih Periode Laporan</label>
-                            <select id="reportPeriod" onchange="window.loadReports()">
+                            <select id="reportPeriod">
                                 <option value="today">Hari Ini</option>
                                 <option value="week">Minggu Ini</option>
                                 <option value="month" selected>Bulan Ini</option>
@@ -441,43 +441,63 @@
         }
     </script>
 
-    <!-- Reports Script (FIXED) -->
+    <!-- Reports Script - COMPLETELY FIXED -->
     <script type="module">
         import { db } from './js/firebase-config.js';
 
         const formatCurrency = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
         const formatDate = (timestamp) => timestamp ? new Date(timestamp.seconds * 1000).toLocaleDateString('id-ID') : '-';
 
+        let isLoadingReports = false; // Prevent multiple simultaneous calls
+
         window.loadReports = async function() {
-            const period = document.getElementById('reportPeriod').value;
-            const now = new Date();
-            let startDate;
-
-            switch (period) {
-                case 'today':
-                    startDate = new Date(now.setHours(0, 0, 0, 0));
-                    break;
-                case 'week':
-                    const firstDayOfWeek = now.getDate() - now.getDay();
-                    startDate = new Date(now.setDate(firstDayOfWeek));
-                    startDate.setHours(0, 0, 0, 0);
-                    break;
-                case 'year':
-                    startDate = new Date(now.getFullYear(), 0, 1);
-                    break;
-                case 'month':
-                default:
-                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                    break;
+            if (isLoadingReports) {
+                console.log('Already loading reports, skipping...');
+                return;
             }
-
+            
+            isLoadingReports = true;
+            
             try {
-                // Ambil semua orders dulu, baru filter di JavaScript
+                const period = document.getElementById('reportPeriod').value;
+                let startDate;
+
+                // FIX: Buat instance Date baru untuk setiap case
+                switch (period) {
+                    case 'today':
+                        startDate = new Date();
+                        startDate.setHours(0, 0, 0, 0);
+                        break;
+                    case 'week':
+                        startDate = new Date();
+                        const dayOfWeek = startDate.getDay();
+                        const diff = startDate.getDate() - dayOfWeek;
+                        startDate.setDate(diff);
+                        startDate.setHours(0, 0, 0, 0);
+                        break;
+                    case 'year':
+                        startDate = new Date();
+                        startDate.setMonth(0, 1);
+                        startDate.setHours(0, 0, 0, 0);
+                        break;
+                    case 'month':
+                    default:
+                        startDate = new Date();
+                        startDate.setDate(1);
+                        startDate.setHours(0, 0, 0, 0);
+                        break;
+                }
+
+                console.log('Loading reports for period:', period, 'Start date:', startDate);
+
+                // Ambil semua orders, lalu filter di JavaScript
                 const ordersSnapshot = await db.collection('orders')
                     .orderBy('createdAt', 'desc')
                     .get();
 
                 const salesDetailBody = document.getElementById('salesDetailTableBody');
+                if (!salesDetailBody) return;
+                
                 salesDetailBody.innerHTML = '';
 
                 // Filter orders berdasarkan periode
@@ -506,9 +526,16 @@
                         salesDetailBody.innerHTML += row;
                     });
                 }
+                
+                console.log('Reports loaded successfully');
             } catch (error) {
                 console.error("Error loading reports: ", error);
-                alert('Gagal memuat data laporan. Silakan coba lagi.');
+                const salesDetailBody = document.getElementById('salesDetailTableBody');
+                if (salesDetailBody) {
+                    salesDetailBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px; color: #e74c3c;">Error: ${error.message}</td></tr>`;
+                }
+            } finally {
+                isLoadingReports = false;
             }
         }
 
@@ -520,12 +547,24 @@
             });
         }
 
-        // Event listener untuk tab Laporan
+        // Event listener - ONLY run once
         document.addEventListener('DOMContentLoaded', () => {
+            // Listen to tab click
             const reportTab = document.querySelector('.nav-item[data-section="reports"]');
             if (reportTab) {
                 reportTab.addEventListener('click', () => {
-                    setTimeout(() => window.loadReports(), 100);
+                    const reportsSection = document.getElementById('reports-section');
+                    if (reportsSection && reportsSection.classList.contains('active')) {
+                        setTimeout(() => window.loadReports(), 100);
+                    }
+                });
+            }
+
+            // Listen to dropdown change
+            const reportPeriod = document.getElementById('reportPeriod');
+            if (reportPeriod) {
+                reportPeriod.addEventListener('change', () => {
+                    window.loadReports();
                 });
             }
         });
