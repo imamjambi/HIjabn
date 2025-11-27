@@ -344,8 +344,8 @@
                         </tr>
                     </tbody>
                 </table>
-            </div> <!-- End Report Container -->
-        </div> <!-- End Reports Section -->
+            </div>
+        </div>
 
         <!-- Settings Section -->
         <div class="content-section" id="settings-section">
@@ -376,15 +376,6 @@
         </div>
     </div>
 
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
-    <!-- Your Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/dashboard.js"></script>
-
     <!-- Modal untuk Detail Pesanan -->
     <div id="orderDetailModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -409,135 +400,131 @@
             </div>
         </div>
     </div>
-</body>
-<script type="module">
-    import { db } from './js/firebase-config.js';
-    // Fungsi ini akan ditambahkan ke window agar bisa dipanggil dari HTML
-    window.markOrderAsCompleted = async function(orderId) {
-        if (!confirm(`Apakah Anda yakin ingin menandai pesanan ${orderId.substring(0,8)}... sebagai 'Selesai'?`)) {
-            return;
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <!-- Your Scripts -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+
+    <!-- Mark Order as Completed Script -->
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+        
+        window.markOrderAsCompleted = async function(orderId) {
+            if (!confirm(`Apakah Anda yakin ingin menandai pesanan ${orderId.substring(0,8)}... sebagai 'Selesai'?`)) {
+                return;
+            }
+
+            const orderRef = db.collection('orders').doc(orderId);
+
+            try {
+                await orderRef.update({
+                    status: 'completed',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert('Status pesanan berhasil diubah menjadi Selesai.');
+                
+                if (window.loadOrdersData) {
+                    window.loadOrdersData();
+                }
+                if (window.loadRecentOrders) {
+                    window.loadRecentOrders();
+                }
+            } catch (error) {
+                console.error("Error updating order status: ", error);
+                alert('Gagal memperbarui status pesanan.');
+            }
+        }
+    </script>
+
+    <!-- Reports Script -->
+    <script type="module">
+        import { db } from './js/firebase-config.js';
+
+        const formatCurrency = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        const formatDate = (timestamp) => timestamp ? new Date(timestamp.seconds * 1000).toLocaleDateString('id-ID') : '-';
+
+        window.loadReports = async function() {
+            const period = document.getElementById('reportPeriod').value;
+            const now = new Date();
+            let startDate;
+
+            switch (period) {
+                case 'today':
+                    startDate = new Date(now.setHours(0, 0, 0, 0));
+                    break;
+                case 'week':
+                    const firstDayOfWeek = now.getDate() - now.getDay();
+                    startDate = new Date(now.setDate(firstDayOfWeek));
+                    startDate.setHours(0, 0, 0, 0);
+                    break;
+                case 'year':
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    break;
+                case 'month':
+                default:
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    break;
+            }
+
+            try {
+                const ordersSnapshot = await db.collection('orders')
+                    .where('createdAt', '>=', startDate)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const salesDetailBody = document.getElementById('salesDetailTableBody');
+                salesDetailBody.innerHTML = '';
+
+                if (ordersSnapshot.empty) {
+                    salesDetailBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">Tidak ada data penjualan untuk periode ini.</td></tr>`;
+                } else {
+                    ordersSnapshot.forEach(doc => {
+                        const order = doc.data();
+                        
+                        const row = `
+                            <tr>
+                                <td>${formatDate(order.createdAt)}</td>
+                                <td>${doc.id.substring(0, 8)}...</td>
+                                <td>${order.customerName || 'N/A'}</td>
+                                <td class="text-center">${order.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
+                                <td class="text-right">${formatCurrency(order.totalAmount)}</td>
+                                <td class="text-center"><span class="status-badge status-${order.status}">${order.status}</span></td>
+                            </tr>
+                        `;
+                        salesDetailBody.innerHTML += row;
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading reports: ", error);
+                alert('Gagal memuat data laporan. Silakan coba lagi.');
+            }
         }
 
-        const orderRef = db.collection('orders').doc(orderId);
-
-        try {
-            await orderRef.update({
-                status: 'completed', // Menggunakan 'completed' agar konsisten dengan statistik
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        window.printReport = function() {
+            window.loadReports().then(() => {
+                setTimeout(() => {
+                    window.print();
+                }, 250);
             });
-            alert('Status pesanan berhasil diubah menjadi Selesai.');
-            
-            // Muat ulang data pesanan di dashboard untuk menampilkan perubahan
-            if (window.loadOrdersData) {
-                window.loadOrdersData();
-            }
-            // Juga muat ulang pesanan terbaru jika ada
-            if (window.loadRecentOrders) {
-                window.loadRecentOrders();
-            }
-
-        } catch (error) {
-            console.error("Error updating order status: ", error);
-            alert('Gagal memperbarui status pesanan.');
-        }
-    }
-</script>
-<script type="module">
-    import { db } from './js/firebase-config.js';
-
-    // --- FUNGSI UNTUK LAPORAN ---
-
-    const formatCurrency = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
-    const formatDate = (timestamp) => timestamp ? new Date(timestamp.seconds * 1000).toLocaleDateString('id-ID') : '-';
-
-    // Fungsi utama untuk memuat data laporan
-    window.loadReports = async function() {
-        const period = document.getElementById('reportPeriod').value;
-        const now = new Date();
-        let startDate;
-
-        // Tentukan rentang tanggal berdasarkan periode yang dipilih
-        switch (period) {
-            case 'today':
-                startDate = new Date(now.setHours(0, 0, 0, 0));
-                break;
-            case 'week':
-                const firstDayOfWeek = now.getDate() - now.getDay();
-                startDate = new Date(now.setDate(firstDayOfWeek));
-                startDate.setHours(0, 0, 0, 0);
-                break;
-            case 'year':
-                startDate = new Date(now.getFullYear(), 0, 1);
-                break;
-            case 'month':
-            default:
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                break;
         }
 
-        try {
-            const ordersSnapshot = await db.collection('orders')
-                .where('createdAt', '>=', startDate)
-                .orderBy('createdAt', 'desc')
-                .get();
-
-            const salesDetailBody = document.getElementById('salesDetailTableBody');
-            salesDetailBody.innerHTML = ''; // Kosongkan tabel sebelum diisi
-
-            if (ordersSnapshot.empty) {
-                salesDetailBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">Tidak ada data penjualan untuk periode ini.</td></tr>`;
-            } else {
-                ordersSnapshot.forEach(doc => {
-                    const order = doc.data();
-                    
-                    // Tambahkan baris ke tabel detail penjualan
-                    const row = `
-                        <tr>
-                            <td>${formatDate(order.createdAt)}</td>
-                            <td>${doc.id.substring(0, 8)}...</td>
-                            <td>${order.customerName || 'N/A'}</td>
-                            <td class="text-center">${order.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
-                            <td class="text-right">${formatCurrency(order.totalAmount)}</td>
-                            <td class="text-center"><span class="status-badge status-${order.status}">${order.status}</span></td>
-                        </tr>
-                    `;
-                    salesDetailBody.innerHTML += row;
+        // Event listener untuk tab Laporan
+        document.addEventListener('DOMContentLoaded', () => {
+            const reportTab = document.querySelector('.nav-item[data-section="reports"]');
+            if (reportTab) {
+                reportTab.addEventListener('click', () => {
+                    setTimeout(() => window.loadReports(), 100);
                 });
             }
 
-        } catch (error) {
-            console.error("Error loading reports: ", error);
-            alert('Gagal memuat data laporan. Silakan coba lagi.');
-        }
-    }
-
-    // Fungsi untuk mencetak laporan
-    window.printReport = function() {
-        // Pastikan data terbaru dimuat sebelum mencetak
-        window.loadReports().then(() => {
-            // Menunggu sebentar agar DOM selesai update sebelum dialog print muncul
-            setTimeout(() => {
-                window.print();
-            }, 250);
+            // REMOVED: Jangan load reports saat pertama kali halaman dimuat
+            // Ini yang menyebabkan infinite reload!
         });
-    }
-
-    // Event listener untuk memuat laporan saat tab "Laporan" diklik
-    document.addEventListener('DOMContentLoaded', () => {
-        const reportTab = document.querySelector('.nav-item[data-section="reports"]');
-        if (reportTab) {
-            reportTab.addEventListener('click', () => {
-                // Panggil loadReports saat tab diaktifkan
-                // Diberi sedikit delay agar transisi section selesai
-                setTimeout(() => window.loadReports(), 50);
-            });
-        }
-
-        // Jika halaman dimuat dan tab laporan sudah aktif (misal setelah refresh)
-        if (document.getElementById('reports-section').classList.contains('active')) {
-            window.loadReports();
-        }
-    });
-
-</script>
+    </script>
+</body>
 </html>
