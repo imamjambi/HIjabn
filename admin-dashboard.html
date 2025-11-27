@@ -441,7 +441,7 @@
         }
     </script>
 
-    <!-- Reports Script -->
+    <!-- Reports Script (FIXED) -->
     <script type="module">
         import { db } from './js/firebase-config.js';
 
@@ -472,27 +472,34 @@
             }
 
             try {
+                // Ambil semua orders dulu, baru filter di JavaScript
                 const ordersSnapshot = await db.collection('orders')
-                    .where('createdAt', '>=', startDate)
                     .orderBy('createdAt', 'desc')
                     .get();
 
                 const salesDetailBody = document.getElementById('salesDetailTableBody');
                 salesDetailBody.innerHTML = '';
 
-                if (ordersSnapshot.empty) {
+                // Filter orders berdasarkan periode
+                const filteredOrders = [];
+                ordersSnapshot.forEach(doc => {
+                    const order = doc.data();
+                    if (order.createdAt && order.createdAt.toDate() >= startDate) {
+                        filteredOrders.push({ id: doc.id, data: order });
+                    }
+                });
+
+                if (filteredOrders.length === 0) {
                     salesDetailBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">Tidak ada data penjualan untuk periode ini.</td></tr>`;
                 } else {
-                    ordersSnapshot.forEach(doc => {
-                        const order = doc.data();
-                        
+                    filteredOrders.forEach(({ id, data: order }) => {
                         const row = `
                             <tr>
                                 <td>${formatDate(order.createdAt)}</td>
-                                <td>${doc.id.substring(0, 8)}...</td>
+                                <td>${id.substring(0, 8)}...</td>
                                 <td>${order.customerName || 'N/A'}</td>
-                                <td class="text-center">${order.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
-                                <td class="text-right">${formatCurrency(order.totalAmount)}</td>
+                                <td class="text-center">${order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0}</td>
+                                <td class="text-right">${formatCurrency(order.totalAmount || 0)}</td>
                                 <td class="text-center"><span class="status-badge status-${order.status}">${order.status}</span></td>
                             </tr>
                         `;
@@ -521,9 +528,6 @@
                     setTimeout(() => window.loadReports(), 100);
                 });
             }
-
-            // REMOVED: Jangan load reports saat pertama kali halaman dimuat
-            // Ini yang menyebabkan infinite reload!
         });
     </script>
 </body>
