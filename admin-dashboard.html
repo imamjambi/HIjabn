@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Gaya khusus untuk Laporan yang diintegrasikan */
+        .report-container {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .report-header h1 { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .report-header p { font-size: 14px; color: #666; }
+
+        .filter-section {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #e5e7eb;
+        }
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 4px; }
+        .form-group select, .form-group input {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #333;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        .report-table th {
+            background: #f3f4f6;
+            text-align: left;
+            padding: 8px;
+            font-weight: bold;
+            border: 1px solid #d1d5db;
+        }
+        .report-table td {
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .report-table tbody tr:nth-child(even) { background: #f9fafb; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* Print Styles for Report */
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .sidebar, .header, .no-print { display: none !important; }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            .content-section {
+                display: none !important;
+                padding: 0 !important;
+                box-shadow: none;
+                border: none;
+            }
+            .content-section.active {
+                display: block !important;
+            }
+            .report-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            .filter-section { display: none !important; }
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Toko Hijabina</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>ADMIN HIJABINA</h3>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-section="dashboard">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </li>
+            <li class="nav-item" data-section="products">
+                <span>🛍️</span>
+                <span>Produk</span>
+            </li>
+            <li class="nav-item" data-section="orders">
+                <span>📦</span>
+                <span>Pesanan</span>
+            </li>
+            <li class="nav-item" data-section="customers">
+                <span>👥</span>
+                <span>Pelanggan</span>
+            </li>
+            <li class="nav-item" data-section="reports">
+                <span>📈</span>
+                <span>Laporan</span>
+            </li>
+            <li class="nav-item" data-section="settings">
+                <span>⚙️</span>
+                <span>Pengaturan</span>
+            </li>
+        </ul>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div style="font-weight: 600;" id="userName">Admin</div>
+                    <div style="font-size: 0.85em; color: #666;" id="userEmail">admin@tokohijabina.com</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="content-section active" id="dashboard-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3>Total Pendapatan</h3>
+                            <div class="stat-value" id="totalRevenue">Rp 0</div>
+                            <div class="stat-change positive">↑ 12% dari bulan lalu</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            💰
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3>Total Pesanan</h3>
+                            <div class="stat-value" id="totalOrders">0</div>
+                            <div class="stat-change positive">↑ 8% dari bulan lalu</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            📦
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3>Total Produk</h3>
+                            <div class="stat-value" id="totalProducts">0</div>
+                            <div class="stat-change positive">↑ 5 produk baru</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            🛍️
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3>Total Pelanggan</h3>
+                            <div class="stat-value" id="totalCustomers">0</div>
+                            <div class="stat-change positive">↑ 15 pelanggan baru</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            👥
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="margin-bottom: 20px;">Pesanan Terbaru</h3>
+                <table class="data-table" id="recentOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>ID Pesanan</th>
+                            <th>Pelanggan</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: #999;">
+                                📭 Belum ada pesanan
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="content-section" id="products-section">
+            <div class="section-header">
+                <h2>Manajemen Produk</h2>
+                <button class="btn-primary" onclick="window.location.href='manage-products.html'">+ Tambah Produk</button>
+            </div>
+            
+            <table class="data-table" id="productsTable">
+                <thead>
+                    <tr>
+                        <th>Gambar</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                            📦 Belum ada produk
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="content-section" id="orders-section">
+            <div class="section-header">
+                <h2>Manajemen Pesanan</h2>
+            </div>
+            
+            <table class="data-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>ID Pesanan</th>
+                        <th>Pelanggan</th>
+                        <th>Total Pesanan Akun</th>
+                        <th>Status</th>
+                        <th>Tanggal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                            📦 Belum ada pesanan
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Customers Section -->
+        <div class="content-section" id="customers-section">
+            <div class="section-header">
+                <h2>Manajemen Pelanggan</h2>
+            </div>
+            
+            <table class="data-table" id="customersTable">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Telepon</th>
+                        <th>Total Pesanan</th>
+                        <th>Bergabung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                            👥 Belum ada pelanggan
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="content-section" id="reports-section">
+            <div class="section-header">
+                <h2 id="reportTitle">Laporan Penjualan</h2>
+                <button class="btn-primary no-print" onclick="window.printReport()">🖨️ Cetak Laporan</button>
+            </div>
+            
+            <div class="report-container">
+                <!-- Filter -->
+                <div class="filter-section no-print">
+                    <div class="filter-row" style="grid-template-columns: 1fr;">
+                        <div class="form-group">
+                            <label for="reportPeriod">Pilih Periode Laporan</label>
+                            <select id="reportPeriod" onchange="window.loadReports()">
+                                <option value="today">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month" selected>Bulan Ini</option>
+                                <option value="year">Tahun Ini</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Detail Penjualan -->
+                <h2 class="section-title" id="salesDetailTitle">Detail Penjualan</h2>
+                <table class="report-table" id="salesDetailTable">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>ID Pesanan</th>
+                            <th>Pelanggan</th>
+                            <th class="text-center">Jumlah Item</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesDetailTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center" style="padding: 30px;">Tidak ada data penjualan untuk periode ini.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div> <!-- End Report Container -->
+        </div> <!-- End Reports Section -->
+
+        <!-- Settings Section -->
+        <div class="content-section" id="settings-section">
+            <div class="section-header">
+                <h2>Pengaturan</h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nama Toko</label>
+                    <input type="text" value="Toko Hijabina" id="storeName">
+                </div>
+                <div class="form-group">
+                    <label>Email Toko</label>
+                    <input type="email" value="info@tokohijabina.com" id="storeEmail">
+                </div>
+                <div class="form-group">
+                    <label>Telepon</label>
+                    <input type="tel" value="+62 812-3456-7890" id="storePhone">
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea id="storeAddress">Jl. Contoh No. 123, Jakarta</textarea>
+                </div>
+            </div>
+            
+            <button class="btn-primary" style="margin-top: 20px;" id="saveSettingsBtn">Simpan Pengaturan</button>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <!-- Your Scripts -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+
+    <!-- Modal untuk Detail Pesanan -->
+    <div id="orderDetailModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detail Pesanan</h2>
+                <span class="modal-close" onclick="document.getElementById('orderDetailModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modalLoading" style="text-align: center; padding: 20px;">Memuat...</div>
+                <div id="modalOrderDetails">
+                    <p><strong>ID Pesanan:</strong> <span id="modalOrderId"></span></p>
+                    <p><strong>Pelanggan:</strong> <span id="modalCustomerName"></span></p>
+                    <p><strong>Total Item:</strong> <span id="modalTotalItems"></span></p>
+                    <p><strong>Tanggal:</strong> <span id="modalOrderDate"></span></p>
+                    <p><strong>Status:</strong> <span id="modalOrderStatus"></span></p>
+                    <hr style="margin: 15px 0;">
+                    <h4>Item yang Dipesan:</h4>
+                    <table class="data-table" style="margin-top: 10px;">
+                        <tbody id="modalOrderItems"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="module">
+    import { db } from './js/firebase-config.js';
+    // Fungsi ini akan ditambahkan ke window agar bisa dipanggil dari HTML
+    window.markOrderAsCompleted = async function(orderId) {
+        if (!confirm(`Apakah Anda yakin ingin menandai pesanan ${orderId.substring(0,8)}... sebagai 'Selesai'?`)) {
+            return;
+        }
+
+        const orderRef = db.collection('orders').doc(orderId);
+
+        try {
+            await orderRef.update({
+                status: 'completed', // Menggunakan 'completed' agar konsisten dengan statistik
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert('Status pesanan berhasil diubah menjadi Selesai.');
+            
+            // Muat ulang data pesanan di dashboard untuk menampilkan perubahan
+            if (window.loadOrdersData) {
+                window.loadOrdersData();
+            }
+            // Juga muat ulang pesanan terbaru jika ada
+            if (window.loadRecentOrders) {
+                window.loadRecentOrders();
+            }
+
+        } catch (error) {
+            console.error("Error updating order status: ", error);
+            alert('Gagal memperbarui status pesanan.');
+        }
+    }
+</script>
+<script type="module">
+    import { db } from './js/firebase-config.js';
+
+    // --- FUNGSI UNTUK LAPORAN ---
+
+    const formatCurrency = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+    const formatDate = (timestamp) => timestamp ? new Date(timestamp.seconds * 1000).toLocaleDateString('id-ID') : '-';
+
+    // Fungsi utama untuk memuat data laporan
+    window.loadReports = async function() {
+        const period = document.getElementById('reportPeriod').value;
+        const now = new Date();
+        let startDate;
+
+        // Tentukan rentang tanggal berdasarkan periode yang dipilih
+        switch (period) {
+            case 'today':
+                startDate = new Date(now.setHours(0, 0, 0, 0));
+                break;
+            case 'week':
+                const firstDayOfWeek = now.getDate() - now.getDay();
+                startDate = new Date(now.setDate(firstDayOfWeek));
+                startDate.setHours(0, 0, 0, 0);
+                break;
+            case 'year':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                break;
+            case 'month':
+            default:
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                break;
+        }
+
+        try {
+            const ordersSnapshot = await db.collection('orders')
+                .where('createdAt', '>=', startDate)
+                .orderBy('createdAt', 'desc')
+                .get();
+
+            const salesDetailBody = document.getElementById('salesDetailTableBody');
+            salesDetailBody.innerHTML = ''; // Kosongkan tabel sebelum diisi
+
+            if (ordersSnapshot.empty) {
+                salesDetailBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">Tidak ada data penjualan untuk periode ini.</td></tr>`;
+            } else {
+                ordersSnapshot.forEach(doc => {
+                    const order = doc.data();
+                    
+                    // Tambahkan baris ke tabel detail penjualan
+                    const row = `
+                        <tr>
+                            <td>${formatDate(order.createdAt)}</td>
+                            <td>${doc.id.substring(0, 8)}...</td>
+                            <td>${order.customerName || 'N/A'}</td>
+                            <td class="text-center">${order.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
+                            <td class="text-right">${formatCurrency(order.totalAmount)}</td>
+                            <td class="text-center"><span class="status-badge status-${order.status}">${order.status}</span></td>
+                        </tr>
+                    `;
+                    salesDetailBody.innerHTML += row;
+                });
+            }
+
+        } catch (error) {
+            console.error("Error loading reports: ", error);
+            alert('Gagal memuat data laporan. Silakan coba lagi.');
+        }
+    }
+
+    // Fungsi untuk mencetak laporan
+    window.printReport = function() {
+        // Pastikan data terbaru dimuat sebelum mencetak
+        window.loadReports().then(() => {
+            // Menunggu sebentar agar DOM selesai update sebelum dialog print muncul
+            setTimeout(() => {
+                window.print();
+            }, 250);
+        });
+    }
+
+    // Event listener untuk memuat laporan saat tab "Laporan" diklik
+    document.addEventListener('DOMContentLoaded', () => {
+        const reportTab = document.querySelector('.nav-item[data-section="reports"]');
+        if (reportTab) {
+            reportTab.addEventListener('click', () => {
+                // Panggil loadReports saat tab diaktifkan
+                // Diberi sedikit delay agar transisi section selesai
+                setTimeout(() => window.loadReports(), 50);
+            });
+        }
+
+        // Jika halaman dimuat dan tab laporan sudah aktif (misal setelah refresh)
+        if (document.getElementById('reports-section').classList.contains('active')) {
+            window.loadReports();
+        }
+    });
+
+</script>
+</html>

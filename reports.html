@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Penjualan - Hijabina</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .report-header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .report-header p {
+            font-size: 14px;
+            color: #666;
+        }
+        .no-print {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-back {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-back:hover {
+            background: #d1d5db;
+        }
+        .filter-section {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #e5e7eb;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .form-group label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .form-group select {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #333;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        .report-table th {
+            background: #f3f4f6;
+            text-align: left;
+            padding: 8px;
+            font-weight: bold;
+            border: 1px solid #d1d5db;
+        }
+        .report-table td {
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .report-table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .rank {
+            font-weight: bold;
+        }
+        .currency {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .report-footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 2px solid #333;
+            font-size: 11px;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+                max-width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .filter-section {
+                display: none !important;
+            }
+            .report-table {
+                page-break-inside: auto;
+            }
+            .report-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            .report-table thead {
+                display: table-header-group;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Tombol Aksi -->
+        <div class="no-print">
+            <a href="admin-dashboard.html" class="btn btn-back">← Kembali</a>
+            <button class="btn btn-primary" onclick="window.printReport()">🖨️ Cetak Laporan</button>
+        </div>
+
+        <!-- Header Laporan -->
+        <div class="report-header">
+            <h1>TOKO HIJABINA</h1>
+            <p>Laporan Penjualan</p>
+            <p id="reportDate">-</p>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-section no-print">
+            <div class="filter-row">
+                <div class="form-group">
+                    <label for="reportPeriod">Pilih Periode Laporan</label>
+                    <select id="reportPeriod" onchange="window.loadReports()">
+                        <option value="today">Hari Ini</option>
+                        <option value="week">Minggu Ini</option>
+                        <option value="month" selected>Bulan Ini</option>
+                        <option value="year">Tahun Ini</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Ringkasan Pendapatan -->
+        <h2 class="section-title" id="revenueSummaryTitle">Ringkasan Pendapatan</h2>
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <h3>Total Pendapatan</h3>
+                <div class="stat-value" id="reportTotalSales">Rp 0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pesanan Selesai</h3>
+                <div class="stat-value" id="reportOrderCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Produk Terjual</h3>
+                <div class="stat-value" id="reportProductsSold">0</div>
+            </div>
+        </div>
+
+        <!-- Ringkasan Pesanan -->
+        <h2 class="section-title" id="orderSummaryTitle">Ringkasan Pesanan</h2>
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <h3>Total Pesanan</h3>
+                <div class="stat-value" id="reportTotalOrdersCount">0</div>
+            </div>
+            <div class="stat-card"><h3 style="color: #856404;">Menunggu</h3><div class="stat-value" id="reportPendingOrders">0</div></div>
+            <div class="stat-card"><h3 style="color: #084298;">Diproses</h3><div class="stat-value" id="reportProcessingOrders">0</div></div>
+            <div class="stat-card"><h3 style="color: #0f5132;">Selesai</h3><div class="stat-value" id="reportCompletedOrders">0</div></div>
+            <div class="stat-card"><h3 style="color: #842029;">Dibatalkan</h3><div class="stat-value" id="reportCancelledOrders">0</div></div>
+        </div>
+
+        <!-- Footer Laporan -->
+        <div class="report-footer">
+            <strong>Toko Hijabina</strong> | Dicetak pada: <span id="printDate">-</span>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script type="module">
+        import { auth, db, firebase } from './js/firebase-config.js';
+
+        // Set tanggal cetak
+        document.getElementById('printDate').textContent = new Date().toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                alert('Akses ditolak!');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('filterPeriod').addEventListener('change', (event) => {
+                loadReports();
+            });
+
+            loadReports();
+        });
+
+        window.loadReports = async function() {
+            const period = document.getElementById('reportPeriod').value;
+
+            try {
+                const { startDate, endDate, periodText } = getDateRange(period);
+                
+                // Update report date header
+                document.getElementById('reportDate').textContent = `Periode: ${periodText}`;
+                document.getElementById('revenueSummaryTitle').textContent = `Ringkasan Pendapatan ${periodText}`;
+                document.getElementById('orderSummaryTitle').textContent = `Ringkasan Pesanan ${periodText}`;
+                document.getElementById('topProductsTitle').textContent = `Produk Terlaris ${periodText}`;
+                document.getElementById('categoryReportTitle').textContent = `Penjualan per Kategori ${periodText}`;
+
+                // Query untuk ringkasan pendapatan (hanya dari pesanan 'completed')
+                let revenueQuery = db.collection('orders').where('status', '==', 'completed');
+                if (startDate) revenueQuery = revenueQuery.where('createdAt', '>=', startDate);
+                if (endDate) revenueQuery = revenueQuery.where('createdAt', '<=', endDate);
+                const revenueSnapshot = await revenueQuery.get();
+                
+                let totalSales = 0;
+                let productsSoldCount = 0;
+                let completedOrderCount = revenueSnapshot.size;
+                const productSales = {};
+                const categorySales = {};
+                
+                for (const doc of revenueSnapshot.docs) {
+                    const order = doc.data();
+                    let orderTotal = order.totalAmount || order.total || order.totalPrice || 0;
+                    if (orderTotal === 0 && order.items && order.items.length > 0) {
+                        orderTotal = order.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                    }
+
+                    totalSales += orderTotal;
+                    
+                    if (order.items) {
+                        order.items.forEach(item => {
+                            productsSoldCount += item.quantity;
+                            if (!productSales[item.productId]) {
+                                productSales[item.productId] = {
+                                    name: item.name,
+                                    category: item.category || 'Tidak ada kategori',
+                                    quantity: 0,
+                                    revenue: 0
+                                };
+                            }
+                            productSales[item.productId].quantity += item.quantity;
+                            productSales[item.productId].revenue += item.price * item.quantity;
+                            
+                            const itemCategory = item.category || 'Lainnya';
+                            if (!categorySales[itemCategory]) {
+                                categorySales[itemCategory] = { quantity: 0, revenue: 0 };
+                            }
+                            categorySales[itemCategory].quantity += item.quantity;
+                            categorySales[itemCategory].revenue += item.price * item.quantity;
+                        });
+                    }
+                }
+
+                // Inisialisasi penghitung status pesanan
+                const orderStatusCounts = { total: 0, pending: 0, processing: 0, completed: 0, cancelled: 0 };
+
+                // Query kedua untuk mendapatkan semua pesanan (untuk statistik status)
+                let allOrdersQuery = db.collection('orders');
+                if (startDate) allOrdersQuery = allOrdersQuery.where('createdAt', '>=', startDate);
+                if (endDate) allOrdersQuery = allOrdersQuery.where('createdAt', '<=', endDate);
+                const allOrdersSnapshot = await allOrdersQuery.get();
+
+                orderStatusCounts.total = allOrdersSnapshot.size;
+                allOrdersSnapshot.forEach(doc => {
+                    const status = doc.data().status || 'pending';
+                    if (orderStatusCounts.hasOwnProperty(status)) {
+                        orderStatusCounts[status]++;
+                    }
+                });
+
+                // Update UI Ringkasan Pendapatan
+                document.getElementById('reportTotalSales').textContent = formatCurrency(totalSales);
+                document.getElementById('reportOrderCount').textContent = completedOrderCount;
+                document.getElementById('reportProductsSold').textContent = productsSoldCount;
+
+                // Update UI Ringkasan Pesanan
+                document.getElementById('reportTotalOrdersCount').textContent = orderStatusCounts.total;
+                document.getElementById('reportPendingOrders').textContent = orderStatusCounts.pending;
+                document.getElementById('reportProcessingOrders').textContent = orderStatusCounts.processing;
+                document.getElementById('reportCompletedOrders').textContent = orderStatusCounts.completed;
+                document.getElementById('reportCancelledOrders').textContent = orderStatusCounts.cancelled;
+
+                // Tampilkan tabel
+                displayTopProducts(productSales);
+                displayCategoryReport(categorySales, totalSales);
+                
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                alert('Gagal memuat laporan: ' + error.message);
+            }
+        }
+
+        function getDateRange(period) {
+            const now = new Date();
+            let startDate, endDate, periodText;
+            
+            switch(period) {
+                case 'today':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    periodText = "Hari Ini";
+                    break;
+                case 'week':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+                    endDate = new Date();
+                    periodText = "Minggu Ini";
+                    break;
+                case 'month':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date();
+                    periodText = "Bulan Ini";
+                    break;
+                case 'year':
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date();
+                    periodText = "Tahun Ini";
+                    break;
+            }
+            
+            return { 
+                startDate: startDate ? firebase.firestore.Timestamp.fromDate(startDate) : null,
+                endDate: endDate ? firebase.firestore.Timestamp.fromDate(endDate) : null,
+                periodText: periodText
+            };
+        }
+
+        function displayTopProducts(productSales) {
+            const tbody = document.getElementById('topProductsTable');
+            const sorted = Object.entries(productSales)
+                .sort((a, b) => b[1].revenue - a[1].revenue)
+                .slice(0, 10);
+            
+            if (sorted.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada data penjualan pada periode ini.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            sorted.forEach(([id, data], index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="text-center rank">${index + 1}</td>
+                        <td>${data.name}</td>
+                        <td class="text-center">${data.quantity}</td>
+                        <td class="text-right currency">${formatCurrency(data.revenue)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function displayCategoryReport(categorySales, totalSales) {
+            const tbody = document.getElementById('categoryReportTable');
+            const sorted = Object.entries(categorySales)
+                .sort((a, b) => b[1].revenue - a[1].revenue);
+            
+            if (sorted.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada data penjualan pada periode ini.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            sorted.forEach(([category, data]) => {
+                const percentage = totalSales > 0 ? ((data.revenue / totalSales) * 100).toFixed(1) : 0;
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${category}</strong></td>
+                        <td class="text-center">${data.quantity}</td>
+                        <td class="text-right currency">${formatCurrency(data.revenue)}</td>
+                        <td class="text-center">${percentage}%</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.printReport = async function() {
+            const printButton = document.querySelector('.btn-primary[onclick="window.printReport()"]');
+            if(printButton) printButton.textContent = 'Menyiapkan...';
+            await window.loadReports();
+            if(printButton) printButton.textContent = '🖨️ Cetak Laporan';
+            window.print();
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+    </script>
+</body>
+</html>

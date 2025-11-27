@@ -1,0 +1,460 @@
+# 🧕 TOKO HIJABINA - Website User
+
+Dokumentasi lengkap untuk website user Toko Hijabina yang terintegrasi dengan sistem admin.
+
+## 📋 Daftar Isi
+- [Struktur File](#struktur-file)
+- [Fitur Utama](#fitur-utama)
+- [Cara Instalasi](#cara-instalasi)
+- [Panduan Penggunaan](#panduan-penggunaan)
+- [Integrasi dengan Admin](#integrasi-dengan-admin)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## 📁 Struktur File
+
+Berikut struktur file yang sudah dibuat dan perlu ditambahkan ke project Anda:
+
+```
+HIJABINA/
+├── .vscode/
+├── assets/
+│   ├── css/
+│   │   └── style.css (existing)
+│   └── js/
+│       ├── firebase-config.js (existing)
+│       ├── user-auth.js (NEW)
+│       └── user-cart.js (NEW)
+│
+├── HTML Files (existing):
+│   ├── index.html
+│   ├── toko.html
+│   ├── admin-dashboard.html
+│   ├── add-member.html
+│   ├── manage-orders.html
+│   ├── manage-products.html
+│   └── reports.html
+│
+├── HTML Files (NEW - User):
+│   ├── user-home.html
+│   ├── user-login.html
+│   ├── user-register.html
+│   ├── user-products.html
+│   ├── user-product-detail.html
+│   ├── user-cart.html
+│   └── user-profile.html
+│
+└── settings.json
+```
+
+---
+
+## ✨ Fitur Utama
+
+### 1. **Halaman Utama (user-home.html)**
+   - Hero section dengan search box
+   - Kategori produk (4 kategori)
+   - Grid produk terbaru (8 produk)
+   - Terintegrasi dengan Firebase
+   - Design modern dengan gradient warna cantik
+
+### 2. **Sistem Autentikasi**
+   - **Login** (user-login.html)
+     - Login dengan email/password
+     - Login dengan Google
+     - Remember me
+     - Lupa password
+   
+   - **Register** (user-register.html)
+     - Form pendaftaran lengkap
+     - Password strength indicator
+     - Validasi real-time
+     - Terms & conditions
+
+### 3. **Katalog Produk (user-products.html)**
+   - Filter berdasarkan kategori
+   - Search produk
+   - Sort (harga, nama)
+   - Filter harga (min-max)
+   - View toggle (grid/list)
+   - Sidebar kategori
+
+### 4. **Detail Produk (user-product-detail.html)**
+   - Gambar produk besar
+   - Spesifikasi lengkap
+   - Quantity selector
+   - Add to cart
+   - Add to wishlist
+   - Review pembeli
+   - Produk terkait
+
+### 5. **Keranjang Belanja (user-cart.html)**
+   - List produk dalam keranjang
+   - Update quantity
+   - Remove item
+   - Ringkasan belanja
+   - Kode promo
+   - Checkout
+
+### 6. **Profil User (user-profile.html)**
+   - Dashboard statistik
+   - Riwayat pesanan
+   - Pengaturan akun
+   - Manage alamat
+   - Logout
+
+---
+
+## 🚀 Cara Instalasi
+
+### Step 1: Copy File HTML
+Salin semua file HTML baru ke folder root project Anda:
+- `user-home.html`
+- `user-login.html`
+- `user-register.html`
+- `user-products.html`
+- `user-product-detail.html`
+- `user-cart.html`
+- `user-profile.html`
+
+### Step 2: Copy File JavaScript
+Salin file JavaScript ke folder `assets/js/`:
+- `user-auth.js`
+- `user-cart.js`
+
+### Step 3: Verifikasi Firebase Config
+Pastikan file `assets/js/firebase-config.js` sudah ada dan terisi dengan benar:
+
+```javascript
+// firebase-config.js
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+```
+
+### Step 4: Setup Firebase Firestore
+
+Buat collections berikut di Firebase Firestore:
+
+1. **Collection: `products`**
+   ```javascript
+   {
+       name: "Hijab Segi Empat Premium",
+       price: 150000,
+       category: "segi-empat",
+       stock: 100,
+       description: "Hijab berkualitas premium...",
+       material: "Voal Premium",
+       size: "110 x 110 cm",
+       createdAt: "2025-11-26"
+   }
+   ```
+
+2. **Collection: `users`**
+   ```javascript
+   {
+       name: "Nama User",
+       email: "user@email.com",
+       phone: "08123456789",
+       role: "user",
+       createdAt: "2025-11-26",
+       address: []
+   }
+   ```
+
+3. **Collection: `orders`** (optional)
+   ```javascript
+   {
+       userId: "user_uid",
+       items: [...],
+       total: 150000,
+       status: "pending",
+       createdAt: "2025-11-26"
+   }
+   ```
+
+### Step 5: Test Website
+1. Buka VS Code
+2. Klik kanan pada `user-home.html`
+3. Pilih "Open with Live Server"
+4. Website akan terbuka di browser
+
+---
+
+## 📖 Panduan Penggunaan
+
+### Untuk User:
+
+#### 1. **Daftar Akun Baru**
+- Buka `user-register.html`
+- Isi form: Nama, Email, No HP, Password
+- Centang agree terms
+- Klik "Daftar Sekarang"
+- Otomatis redirect ke login
+
+#### 2. **Login**
+- Buka `user-login.html` atau akan otomatis redirect
+- Masukkan email dan password
+- Atau gunakan "Login dengan Google"
+- Klik "Masuk"
+
+#### 3. **Browse Produk**
+- Dari home, klik kategori atau "Produk"
+- Gunakan search untuk cari produk
+- Filter berdasarkan kategori
+- Sort berdasarkan harga/nama
+
+#### 4. **Belanja**
+- Klik produk untuk lihat detail
+- Pilih quantity
+- Klik "Tambah ke Keranjang"
+- Lanjut ke keranjang
+- Input kode promo (optional)
+- Klik "Lanjut ke Pembayaran"
+
+#### 5. **Manage Profil**
+- Klik icon user di navbar
+- Lihat dashboard, pesanan
+- Edit profil di "Pengaturan"
+- Tambah/edit alamat
+
+---
+
+## 🔗 Integrasi dengan Admin
+
+Website user **SUDAH TERINTEGRASI** dengan sistem admin melalui Firebase:
+
+### Data Products
+- Admin menambah produk di `manage-products.html`
+- Produk otomatis muncul di website user
+- Real-time sync menggunakan Firestore
+
+### Data Users
+- User register melalui `user-register.html`
+- Data tersimpan di Firestore collection `users`
+- Admin bisa lihat di `add-member.html` (jika sudah diupdate)
+
+### Data Orders
+- User checkout di `user-cart.html`
+- Order tersimpan di localStorage dan Firestore
+- Admin bisa track di `manage-orders.html`
+
+### Cara Menghubungkan:
+
+**File yang perlu diupdate di admin:**
+
+1. **manage-orders.html** - Tambahkan query untuk user orders:
+```javascript
+// Tambahkan filter untuk user orders
+const ordersQuery = query(
+    collection(db, 'orders'),
+    where('status', '==', 'pending')
+);
+```
+
+2. **add-member.html** - Sudah otomatis terkoneksi, tinggal fetch:
+```javascript
+// Fetch users dengan role 'user'
+const usersQuery = query(
+    collection(db, 'users'),
+    where('role', '==', 'user')
+);
+```
+
+---
+
+## 🎨 Customization
+
+### Mengubah Warna Theme:
+Edit gradient di setiap file HTML:
+
+```css
+/* Ganti gradient utama */
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+/* Dengan warna pilihan Anda */
+background: linear-gradient(135deg, #WARNA1 0%, #WARNA2 100%);
+```
+
+### Menambah Kategori:
+Edit di `user-home.html` dan `user-products.html`:
+
+```html
+<div class="category-card" onclick="filterCategory('kategori-baru')">
+    <div class="category-icon">🎀</div>
+    <h3>Kategori Baru</h3>
+</div>
+```
+
+### Menambah Kode Promo:
+Edit di `user-cart.js`:
+
+```javascript
+const PROMO_CODES = {
+    'HIJAB10': { discount: 10000, type: 'fixed', minPurchase: 100000 },
+    'KODEBARU': { discount: 25000, type: 'fixed', minPurchase: 150000 }
+};
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Problem 1: Firebase Not Loading
+**Solusi:**
+- Cek `firebase-config.js` sudah benar
+- Pastikan semua API key valid
+- Cek internet connection
+
+### Problem 2: Products Tidak Muncul
+**Solusi:**
+- Buka Firebase Console
+- Cek collection `products` ada data
+- Cek struktur data sesuai format
+- Cek console browser untuk error
+
+### Problem 3: Login Gagal
+**Solusi:**
+- Cek Authentication di Firebase sudah enabled
+- Enable Email/Password authentication
+- Enable Google authentication (optional)
+- Cek email/password benar
+
+### Problem 4: Cart Tidak Tersimpan
+**Solusi:**
+- Cek localStorage browser tidak disabled
+- Cek console untuk error
+- Clear cache browser dan coba lagi
+
+### Problem 5: Live Server Error
+**Solusi:**
+- Install extension "Live Server" di VS Code
+- Restart VS Code
+- Atau buka file langsung di browser
+
+---
+
+## 📱 Responsive Design
+
+Website ini **sudah responsive** untuk:
+- ✅ Desktop (1920px+)
+- ✅ Laptop (1366px)
+- ✅ Tablet (768px)
+- ✅ Mobile (375px+)
+
+Test di berbagai device menggunakan:
+- Chrome DevTools (F12)
+- Responsive Design Mode
+
+---
+
+## 🔒 Security Features
+
+1. **Authentication dengan Firebase**
+   - Secure login/register
+   - Password hashing otomatis
+   - Session management
+
+2. **Input Validation**
+   - Email validation
+   - Password strength check
+   - XSS protection
+
+3. **Data Privacy**
+   - User data di Firestore dengan rules
+   - localStorage untuk cart (client-side only)
+
+---
+
+## 📊 Firebase Security Rules
+
+Tambahkan rules berikut di Firebase Console > Firestore Database > Rules:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Products - Read: semua, Write: admin only
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Users - Read/Write: owner only atau admin
+    match /users/{userId} {
+      allow read: if request.auth != null && 
+                  (request.auth.uid == userId || 
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Orders - Read/Write: owner only
+    match /orders/{orderId} {
+      allow read: if request.auth != null && 
+                  resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+                    resource.data.userId == request.auth.uid;
+    }
+  }
+}
+```
+
+---
+
+## 📞 Support
+
+Jika ada pertanyaan atau error:
+1. Check console browser (F12)
+2. Check Firebase Console untuk data
+3. Pastikan semua file sudah di copy dengan benar
+4. Restart Live Server
+
+---
+
+## ✅ Checklist Setup
+
+- [ ] Copy 7 file HTML user
+- [ ] Copy 2 file JavaScript (user-auth.js, user-cart.js)
+- [ ] Verifikasi firebase-config.js
+- [ ] Setup Firestore collections (products, users, orders)
+- [ ] Setup Firebase Authentication (Email & Google)
+- [ ] Setup Firebase Security Rules
+- [ ] Test user registration
+- [ ] Test user login
+- [ ] Test browse products
+- [ ] Test add to cart
+- [ ] Test checkout
+- [ ] Test responsive design
+
+---
+
+## 🎉 Selamat!
+
+Website user Toko Hijabina Anda sudah siap digunakan!
+
+**Next Steps:**
+1. Tambahkan lebih banyak produk di admin
+2. Customize warna sesuai brand
+3. Tambahkan fitur payment gateway (optional)
+4. Deploy ke hosting (Firebase Hosting/Netlify)
+
+---
+
+**Dibuat dengan ❤️ untuk Toko Hijabina**

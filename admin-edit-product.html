@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Produk - Admin Hijabina</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .form-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .form-header h1 {
+            font-size: 1.8rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .image-preview-container {
+            margin-top: 1rem;
+        }
+        .image-preview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>ADMIN HIJABINA</h3>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" data-section="dashboard">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </li>
+            <li class="nav-item active" data-section="products">
+                <span>🛍️</span>
+                <span>Produk</span>
+            </li>
+            <li class="nav-item" data-section="orders">
+                <span>📦</span>
+                <span>Pesanan</span>
+            </li>
+            <li class="nav-item" data-section="customers">
+                <span>👥</span>
+                <span>Pelanggan</span>
+            </li>
+            <li class="nav-item" data-section="reports">
+                <span>📈</span>
+                <span>Laporan</span>
+            </li>
+            <li class="nav-item" data-section="settings">
+                <span>⚙️</span>
+                <span>Pengaturan</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>Edit Produk</h1>
+                <p>Perbarui detail produk di bawah ini.</p>
+            </div>
+
+            <div id="alert" class="alert" style="display: none;"></div>
+            <div id="loading" class="loading" style="display: none; text-align: center; padding: 20px;">Memuat...</div>
+
+            <form id="editProductForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="productName">Nama Produk *</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">Kategori *</label>
+                        <select id="productCategory" required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="Hijab Segi Empat">Hijab Segi Empat</option>
+                            <option value="Hijab Pashmina">Hijab Pashmina</option>
+                            <option value="Hijab Instan">Hijab Instan</option>
+                            <option value="Hijab Syari">Hijab Syari</option>
+                            <option value="Hijab Sport">Hijab Sport</option>
+                            <option value="Aksesoris">Aksesoris</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Harga *</label>
+                        <input type="number" id="productPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock">Stok *</label>
+                        <input type="number" id="productStock" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="productImagePath">Path Gambar Produk</label>
+                        <input type="text" id="productImagePath" placeholder="Contoh: images/nama-produk.jpg">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="productDescription">Deskripsi</label>
+                        <textarea id="productDescription" rows="6"></textarea>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn-primary">Simpan Perubahan</button>
+                    <button type="button" class="btn-secondary" onclick="window.location.href='admin-dashboard.html#products-section'">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/admin-edit-product-logic.js"></script>
+    <script type="module">
+        import { auth, db } from './js/firebase-config.js';
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login-page.html';
+            } else {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                    alert('Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
