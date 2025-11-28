@@ -630,7 +630,7 @@
 
                 setTimeout(() => {
                     if (role === 'admin') {
-                        window.location.href = 'admin-dashboard.html';
+                        window.location.href = 'index.html'; // PERBAIKAN: Arahkan ke dashboard admin yang benar
                     } else {
                         window.location.href = 'user-home.html'; // Path ini sudah benar dari root
                     }
@@ -673,7 +673,6 @@
                     name: name,
                     email: email,
                     phone: phone,
-                    role: 'customer', // Semua pendaftaran baru adalah 'customer'
                     role: 'customer', // Memastikan semua pendaftaran baru adalah 'customer'
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -694,7 +693,9 @@
         });
 
         // Logika Login Google
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+        const googleLoginBtn = document.querySelector('.btn-google'); // Menggunakan class selector
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
                 const result = await auth.signInWithPopup(provider);
@@ -711,13 +712,11 @@
                         email: user.email,
                         phone: user.phoneNumber || '',
                         role: 'customer',
-                        role: 'customer', // Memastikan pengguna Google baru juga 'customer'
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
                 } else {
                     role = userDoc.data().role || 'customer';
-                    role = userDoc.data().role || 'customer'; // Ambil role yang ada
                 }
 
                 localStorage.setItem('userRole', role);
@@ -725,7 +724,7 @@
 
                 setTimeout(() => {
                     if (role === 'admin') {
-                        window.location.href = 'admin-dashboard.html';
+                        window.location.href = 'index.html'; // PERBAIKAN: Arahkan ke dashboard admin yang benar
                     } else {
                         window.location.href = 'user-home.html'; // Path ini sudah benar dari root
                     }
@@ -736,6 +735,7 @@
                 showAlert('Login dengan Google gagal. Silakan coba lagi.', 'error');
             }
         });
+        }
     </script>
 </body>
 </html>

@@ -185,6 +185,8 @@ body {
     width: 30px;
     height: 30px;
     margin: 0 auto;
+    /* Tambahkan animasi putaran ke spinner, abaikan aturan global */
+    animation: spin 1s linear infinite !important;
 }
 
 /* Sidebar Styles */
@@ -252,6 +254,7 @@ body {
     margin-left: 260px;
     padding: 20px;
     min-height: 100vh;
+    position: relative; /* Diperlukan untuk loader overlay */
 }
 
 /* Header */
@@ -431,6 +434,10 @@ body {
     border-bottom: 1px solid #f0f0f0;
 }
 
+.data-table td:first-child {
+    font-weight: 500; /* Membuat kolom pertama (ID/Nama) sedikit lebih tebal */
+}
+
 .data-table tbody tr:hover {
     background: #f8f9fa;
 }
@@ -469,6 +476,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.85em;
+    transition: opacity 0.2s; /* Menambahkan transisi halus */
 }
 
 .btn-view {
@@ -645,4 +653,26 @@ body {
     color: #333;
 }
 
-/* NO KEYFRAMES - ALL REMOVED TO PREVENT FLICKER */
+/* Loader Overlay Styles */
+.loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    display: none; /* Sembunyi secara default */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+/* Keyframes untuk animasi spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* NO KEYFRAMES - ALL REMOVED TO PREVENT FLICKER (Kecuali yang dibutuhkan) */

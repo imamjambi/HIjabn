@@ -129,6 +129,10 @@
     </div>
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Loader Overlay -->
+        <div class="loader-overlay" id="loader-overlay">
+            <div class="spinner"></div>
+        </div>
         <!-- Header -->
         <div class="header">
             <h1 id="pageTitle">Dashboard</h1>
@@ -143,14 +147,13 @@
         </div>
 
         <!-- Dashboard Section -->
-        <div class="content-section active" id="dashboard-section">
+        <div class="content-section active" id="dashboard" data-title="Dashboard">
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <div>
                             <h3>Total Pendapatan</h3>
                             <div class="stat-value" id="totalRevenue">Rp 0</div>
-                            <div class="stat-change positive">↑ 12% dari bulan lalu</div>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             💰
@@ -163,7 +166,6 @@
                         <div>
                             <h3>Total Pesanan</h3>
                             <div class="stat-value" id="totalOrders">0</div>
-                            <div class="stat-change positive">↑ 8% dari bulan lalu</div>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                             📦
@@ -176,7 +178,6 @@
                         <div>
                             <h3>Total Produk</h3>
                             <div class="stat-value" id="totalProducts">0</div>
-                            <div class="stat-change positive">↑ 5 produk baru</div>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                             🛍️
@@ -189,7 +190,6 @@
                         <div>
                             <h3>Total Pelanggan</h3>
                             <div class="stat-value" id="totalCustomers">0</div>
-                            <div class="stat-change positive">↑ 15 pelanggan baru</div>
                         </div>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
                             👥
@@ -222,7 +222,7 @@
         </div>
 
         <!-- Products Section -->
-        <div class="content-section" id="products-section">
+        <div class="content-section" id="products" data-title="Manajemen Produk">
             <div class="section-header">
                 <h2>Manajemen Produk</h2>
                 <button class="btn-primary" onclick="window.location.href='manage-products.html'">+ Tambah Produk</button>
@@ -250,7 +250,7 @@
         </div>
 
         <!-- Orders Section -->
-        <div class="content-section" id="orders-section">
+        <div class="content-section" id="orders" data-title="Manajemen Pesanan">
             <div class="section-header">
                 <h2>Manajemen Pesanan</h2>
             </div>
@@ -260,7 +260,7 @@
                     <tr>
                         <th>ID Pesanan</th>
                         <th>Pelanggan</th>
-                        <th>Total Pesanan Akun</th>
+                        <th>Total</th>
                         <th>Status</th>
                         <th>Tanggal</th>
                         <th>Aksi</th>
@@ -277,7 +277,7 @@
         </div>
 
         <!-- Customers Section -->
-        <div class="content-section" id="customers-section">
+        <div class="content-section" id="customers" data-title="Manajemen Pelanggan">
             <div class="section-header">
                 <h2>Manajemen Pelanggan</h2>
             </div>
@@ -303,7 +303,7 @@
         </div>
 
         <!-- Reports Section -->
-        <div class="content-section" id="reports-section">
+        <div class="content-section" id="reports" data-title="Laporan Penjualan">
             <div class="section-header">
                 <h2 id="reportTitle">Laporan Penjualan</h2>
                 <button class="btn-primary no-print" onclick="window.printReport()">🖨️ Cetak Laporan</button>
@@ -348,7 +348,7 @@
         </div> <!-- End Reports Section -->
 
         <!-- Settings Section -->
-        <div class="content-section" id="settings-section">
+        <div class="content-section" id="settings" data-title="Pengaturan">
             <div class="section-header">
                 <h2>Pengaturan</h2>
             </div>
@@ -382,9 +382,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     
     <!-- Your Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/dashboard.js"></script>
-
+    <script type="module" src="js/app.js"></script>
     <!-- Modal untuk Detail Pesanan -->
     <div id="orderDetailModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -409,149 +407,4 @@
             </div>
         </div>
     </div>
-</body>
-<script type="module">
-    import { db } from './js/firebase-config.js';
-    // Fungsi ini akan ditambahkan ke window agar bisa dipanggil dari HTML
-    window.markOrderAsCompleted = async function(orderId) {
-        if (!confirm(`Apakah Anda yakin ingin menandai pesanan ${orderId.substring(0,8)}... sebagai 'Selesai'?`)) {
-            return;
-        }
-
-        const orderRef = db.collection('orders').doc(orderId);
-
-        try {
-            await orderRef.update({
-                status: 'completed', // Menggunakan 'completed' agar konsisten dengan statistik
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert('Status pesanan berhasil diubah menjadi Selesai.');
-            
-            // Muat ulang data pesanan di dashboard untuk menampilkan perubahan
-            if (window.loadOrdersData) {
-                window.loadOrdersData();
-            }
-            // Juga muat ulang pesanan terbaru jika ada
-            if (window.loadRecentOrders) {
-                window.loadRecentOrders();
-            }
-
-        } catch (error) {
-            console.error("Error updating order status: ", error);
-            alert('Gagal memperbarui status pesanan.');
-        }
-    }
-</script>
-<script type="module">
-    import { db } from './js/firebase-config.js';
-
-    // --- FUNGSI UNTUK LAPORAN ---
-
-    const formatCurrency = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
-    const formatDate = (timestamp) => timestamp ? new Date(timestamp.seconds * 1000).toLocaleDateString('id-ID') : '-';
-
-    // Fungsi utama untuk memuat data laporan
-    window.loadReports = async function() {
-        const period = document.getElementById('reportPeriod').value;
-        const now = new Date();
-        let startDate;
-
-        // Tentukan rentang tanggal berdasarkan periode yang dipilih
-        switch (period) {
-            case 'today':
-                startDate = new Date(now.setHours(0, 0, 0, 0));
-                break;
-            case 'week':
-                const firstDayOfWeek = now.getDate() - now.getDay();
-                startDate = new Date(now.setDate(firstDayOfWeek));
-                startDate.setHours(0, 0, 0, 0);
-                break;
-            case 'year':
-                startDate = new Date(now.getFullYear(), 0, 1);
-                break;
-            case 'month':
-            default:
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                break;
-        }
-
-        try {
-            const ordersSnapshot = await db.collection('orders')
-                .where('createdAt', '>=', startDate)
-                .orderBy('createdAt', 'desc')
-                .get();
-
-            const salesDetailBody = document.getElementById('salesDetailTableBody');
-            salesDetailBody.innerHTML = ''; // Kosongkan tabel sebelum diisi
-
-            if (ordersSnapshot.empty) {
-                salesDetailBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">Tidak ada data penjualan untuk periode ini.</td></tr>`;
-            } else {
-                ordersSnapshot.forEach(doc => {
-                    const order = doc.data();
-                    
-                    // Hitung total harga dari items jika totalAmount tidak ada
-                    let totalAmount = order.totalAmount || 0;
-                    
-                    // Jika totalAmount 0 atau undefined, hitung dari items
-                    if (!totalAmount && order.items && order.items.length > 0) {
-                        totalAmount = order.items.reduce((sum, item) => {
-                            const itemTotal = (item.price || 0) * (item.quantity || 0);
-                            return sum + itemTotal;
-                        }, 0);
-                    }
-                    
-                    // Hitung jumlah item
-                    const itemCount = order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0;
-                    
-                    // Tambahkan baris ke tabel detail penjualan
-                    const row = `
-                        <tr>
-                            <td>${formatDate(order.createdAt)}</td>
-                            <td>${doc.id.substring(0, 8)}...</td>
-                            <td>${order.customerName || order.customerEmail || 'N/A'}</td>
-                            <td class="text-center">${itemCount}</td>
-                            <td class="text-right">${formatCurrency(totalAmount)}</td>
-                            <td class="text-center"><span class="status-badge status-${order.status}">${order.status}</span></td>
-                        </tr>
-                    `;
-                    salesDetailBody.innerHTML += row;
-                });
-            }
-
-        } catch (error) {
-            console.error("Error loading reports: ", error);
-            alert('Gagal memuat data laporan. Silakan coba lagi.');
-        }
-    }
-
-    // Fungsi untuk mencetak laporan
-    window.printReport = function() {
-        // Pastikan data terbaru dimuat sebelum mencetak
-        window.loadReports().then(() => {
-            // Menunggu sebentar agar DOM selesai update sebelum dialog print muncul
-            setTimeout(() => {
-                window.print();
-            }, 250);
-        });
-    }
-
-    // Event listener untuk memuat laporan saat tab "Laporan" diklik
-    document.addEventListener('DOMContentLoaded', () => {
-        const reportTab = document.querySelector('.nav-item[data-section="reports"]');
-        if (reportTab) {
-            reportTab.addEventListener('click', () => {
-                // Panggil loadReports saat tab diaktifkan
-                // Diberi sedikit delay agar transisi section selesai
-                setTimeout(() => window.loadReports(), 50);
-            });
-        }
-
-        // Jika halaman dimuat dan tab laporan sudah aktif (misal setelah refresh)
-        if (document.getElementById('reports-section').classList.contains('active')) {
-            window.loadReports();
-        }
-    });
-
-</script>
 </html>
