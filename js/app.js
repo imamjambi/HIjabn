@@ -146,10 +146,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Tampilkan section default (Dashboard) saat halaman pertama kali dimuat
-    showSection('dashboard').then(() => {
-        // Jika halaman dimuat dan tab laporan sudah aktif (misal setelah refresh)
-        if (document.querySelector('#reports.content-section.active')) {
+    // --- Logika Pemuatan Awal Halaman ---
+    // Cek hash di URL (#) untuk menentukan section mana yang akan ditampilkan pertama kali.
+    // Ini memungkinkan kita membuat link langsung ke tab tertentu, misal: index.html#products
+    const initialSectionId = window.location.hash.substring(1) || 'dashboard';
+
+    // Tandai item navigasi yang sesuai sebagai aktif
+    const initialNavItem = document.querySelector(`.nav-item[data-section="${initialSectionId}"]`);
+    if (initialNavItem) {
+        navItems.forEach(nav => nav.classList.remove('active'));
+        initialNavItem.classList.add('active');
+    }
+
+    // Tampilkan section yang sesuai berdasarkan URL atau default ke 'dashboard'
+    showSection(initialSectionId).finally(() => {
+        if (initialSectionId === 'reports') {
             window.loadReports();
         }
     });
@@ -234,14 +245,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const product = doc.data();
                 const row = `
                     <tr>
-                        <td><img src="${product.image || 'https://via.placeholder.com/50'}" class="product-image" alt="${product.name}"></td>
+                        <td>
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/60'}" 
+                                 alt="${product.name}" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" 
+                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/60';">
+                        </td>
                         <td>${product.name}</td>
                         <td>${product.category || 'N/A'}</td>
                         <td>${formatCurrency(product.price)}</td>
                         <td>${product.stock || 0}</td>
                         <td>
-                            <button class="action-btn btn-edit" onclick="window.location.href='admin-edit-product.html?id=${doc.id}'">✏️ Edit</button>
-                            <button class="action-btn btn-delete" onclick="window.deleteProduct('${doc.id}')">🗑️ Hapus</button>
+                            <button class="action-btn btn-edit" title="Edit Produk" onclick="window.location.href='admin-edit-product.html?id=${doc.id}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/></svg>
+                            </button>
+                            <button class="action-btn btn-delete" title="Hapus Produk" onclick="window.deleteProduct('${doc.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -273,7 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
                         <td>${formatDate(order.createdAt)}</td>
                         <td>
-                            <button class="action-btn btn-view" onclick="window.location.href='manage-orders.html?id=${doc.id}'">Detail</button>
+                            <button class="action-btn btn-view" title="Lihat Detail" onclick="window.location.href='manage-orders.html?id=${doc.id}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.878 1.48-2.242 2.657-4.03 3.438C8.807 12.332 7.115 12.5 5.5 12.5c-1.615 0-3.307-.168-4.832-.814A13.133 13.133 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/></svg>
+                            </button>
+                            <button class="action-btn btn-complete" title="Selesaikan Pesanan" onclick="window.markOrderAsCompleted('${doc.id}', this)" ${order.status === 'completed' ? 'disabled' : ''}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg>
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -466,22 +491,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Jadikan fungsi markOrderAsCompleted global
-    window.markOrderAsCompleted = async function(orderId) {
-        if (!confirm(`Apakah Anda yakin ingin menandai pesanan ${orderId.substring(0,8)}... sebagai 'Selesai'?`)) {
-            return;
-        }
-        try {
-            await db.collection('orders').doc(orderId).update({
-                status: 'completed',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert('Status pesanan berhasil diubah menjadi Selesai.');
-            // Muat ulang data yang relevan
-            loadOrdersData();
-            loadDashboardStats();
-        } catch (error) {
-            console.error("Error updating order status: ", error);
-            alert('Gagal memperbarui status pesanan.');
-        }
+window.markOrderAsCompleted = async function(orderId, button) {
+    if (!confirm(`Apakah Anda yakin ingin menandai pesanan #${orderId.substring(0,8)}... sebagai 'Selesai'?`)) {
+        return;
     }
+
+    if (button) {
+        button.disabled = true; // Nonaktifkan tombol untuk mencegah klik ganda
+    }
+
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: 'completed',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Status pesanan berhasil diubah menjadi Selesai.');
+        loadOrdersData(); // Muat ulang data pesanan untuk refresh tabel
+    } catch (error) {
+        console.error("Error updating order status: ", error);
+        alert('Gagal memperbarui status pesanan.');
+        if (button) button.disabled = false; // Aktifkan kembali jika gagal
+    }
+}
 });

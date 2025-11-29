@@ -1,7 +1,5 @@
-// d:\HIJABINA\js\add-product-logic.js
-
 // Impor instance Firebase dari file konfigurasi
-import { db, auth } from './firebase-config.js'; 
+import { db, auth } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const productForm = document.getElementById('productForm');
@@ -27,49 +25,61 @@ document.addEventListener('DOMContentLoaded', () => {
         alertBox.textContent = message;
         alertBox.className = `alert alert-${type}`;
         alertBox.style.display = 'block';
-        window.scrollTo(0, 0); // Scroll ke atas agar notifikasi terlihat
+        window.scrollTo(0, 0);
     }
 
     // Handle form submission
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        console.log('=== FORM SUBMIT STARTED ===');
+        
         loadingIndicator.style.display = 'block';
         alertBox.style.display = 'none';
 
-        // Ambil path gambar langsung dari input dengan id="img"
-        const imageUrl = document.getElementById('img').value.trim(); // Menggunakan id="img"
+        // Ambil path gambar dari input
+        const imageUrl = document.getElementById('productImage').value.trim();
+        console.log('1. Image URL:', imageUrl);
 
         try {
             // 1. Siapkan data produk untuk disimpan ke Firestore
             const productData = {
                 name: document.getElementById('productName').value,
                 category: document.getElementById('productCategory').value,
-                price: parseFloat(document.getElementById('productPrice').value),
-                stock: parseInt(document.getElementById('productStock').value, 10),
-                description: document.getElementById('desc').value, // Menggunakan id="desc"
-                image: imageUrl, // Simpan path lengkap ke field 'image'
+                price: Number(document.getElementById('productPrice').value),
+                stock: Number(document.getElementById('productStock').value),
+                description: document.getElementById('desc').value,
+                imageUrl: imageUrl,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             };
 
+            console.log('2. Product Data:', productData);
+
             // Validasi data
             if (!productData.name || !productData.category || !productData.price || !productData.stock) {
-                throw new Error("Field yang ditandai * wajib diisi.");
+                throw new Error("Semua field yang ditandai * wajib diisi.");
             }
 
+            console.log('3. Validation passed');
+
             // 2. Simpan data produk ke Firestore
-            await db.collection('products').add(productData);
+            console.log('4. Attempting to save to Firestore...');
+            const docRef = await db.collection('products').add(productData);
+            console.log('5. Successfully saved! Doc ID:', docRef.id);
 
             // 3. Tampilkan pesan sukses dan redirect
             showAlert('✅ Produk berhasil ditambahkan!', 'success');
             productForm.reset();
 
             setTimeout(() => {
-                window.location.href = 'admin-dashboard.html#products-section';
+                window.location.href = 'index.html';
             }, 2000);
 
         } catch (error) {
-            console.error("Error adding product: ", error);
+            console.error('❌ ERROR:', error);
+            console.error('Error code:', error.code);
+            console.error('Error message:', error.message);
             showAlert(`❌ Gagal menambahkan produk: ${error.message}`, 'error');
         } finally {
             loadingIndicator.style.display = 'none';

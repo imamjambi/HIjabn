@@ -18,7 +18,6 @@
             min-height: 100vh;
         }
 
-        /* Navbar */
         .navbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -38,23 +37,6 @@
             gap: 10px;
             font-size: 1.5rem;
             font-weight: bold;
-            color: #764ba2;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-menu a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-menu a:hover {
             color: #764ba2;
         }
 
@@ -93,7 +75,6 @@
             justify-content: center;
         }
 
-        /* Hero Section */
         .hero {
             padding: 4rem 5%;
             text-align: center;
@@ -141,14 +122,8 @@
             transition: background 0.3s;
         }
 
-        .search-box button:hover {
-            background: #5a3780;
-        }
-
-        /* Categories */
-        .categories {
+        .products {
             padding: 3rem 5%;
-            background: white;
         }
 
         .section-title {
@@ -158,60 +133,11 @@
             margin-bottom: 2rem;
         }
 
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .category-card {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .category-card:nth-child(2) {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-        }
-
-        .category-card:nth-child(3) {
-            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-        }
-
-        .category-card:nth-child(4) {
-            background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);
-        }
-
-        .category-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-
-        .category-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .category-card h3 {
-            color: #333;
-            font-size: 1.2rem;
-        }
-
-        /* Products Section */
-        .products {
-            padding: 3rem 5%;
-        }
-
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2.5rem;
+            max-width: 1400px;
             margin: 2rem auto 0;
         }
 
@@ -222,6 +148,8 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
@@ -231,64 +159,52 @@
 
         .product-image {
             width: 100%;
-            height: 280px;
+            height: 300px;
             background-color: #f0f0f0;
         }
+
         .product-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: white;
         }
 
         .product-info {
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .product-name {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #333;
-            margin-bottom: 0.5rem;
-            /* Pastikan nama produk tidak terlalu panjang */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
         }
 
-            .product-stock {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-            /* Pastikan nama produk tidak terlalu panjang */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
         .product-meta {
             display: flex;
             justify-content: space-between;
             font-size: 0.85rem;
             color: #666;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             padding-bottom: 0.75rem;
             border-bottom: 1px solid #f0f0f0;
         }
+
         .product-description {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 1rem;
-            height: 40px; /* Memberi ruang untuk 2 baris teks */
-            overflow: hidden;
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            flex-grow: 1;
+            min-height: 80px;
         }
 
         .product-price {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: #764ba2;
             font-weight: bold;
             margin-bottom: 1rem;
@@ -296,7 +212,7 @@
 
         .btn-add-cart {
             width: 100%;
-            padding: 0.8rem;
+            padding: 0.9rem;
             background: #764ba2;
             color: white;
             border: none;
@@ -304,13 +220,13 @@
             cursor: pointer;
             font-weight: 600;
             transition: background 0.3s;
+            font-size: 0.95rem;
         }
 
         .btn-add-cart:hover {
             background: #5a3780;
         }
 
-        /* Footer */
         .footer {
             background: #2d3436;
             color: white;
@@ -346,33 +262,26 @@
         }
 
         @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-            
             .hero h1 {
                 font-size: 2rem;
             }
             
-            .category-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">
             <img src="assets/images/logo1.png" alt="Logo Hijabina" style="height: 40px;">
             <span style="font-size: 1.5rem;">✨Hijabina</span>
         </div>
-        </ul>
         <div class="nav-icons">
             <span id="userName" style="font-weight: 600;"></span>
-            <button class="icon-btn" id="logoutButton">
-                🚪
-            </button>
+            <button class="icon-btn" id="logoutButton">🚪</button>
             <button class="icon-btn" onclick="window.location.href='user-cart.html'">
                 🛒
                 <span class="cart-badge" id="cartCount">0</span>
@@ -380,7 +289,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
         <h1>Halo, Cantik! Temukan hijab pilihanmu di sini.</h1>
         <p>Tampil sederhana, tetap istimewa. Mulai dari sini.💕</p>
@@ -389,17 +297,14 @@
             <button>Cari</button>
         </div>
     </section>
-    </section>
 
-    <!-- Products -->
     <section class="products">
         <h2 class="section-title">Produk Terbaru</h2>
         <div class="product-grid" id="productGrid">
-            <!-- Products will be loaded here by JavaScript -->
+            <!-- Products will be loaded here -->
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -424,7 +329,6 @@
         </div>
     </footer>
 
-    <!-- Firebase Scripts (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -432,20 +336,16 @@
     <script type="module">
         import { auth, db } from './js/firebase-config.js';
 
-        // CHECK AUTHENTICATION
         auth.onAuthStateChanged((user) => {
             if (!user) {
-                // User belum login, redirect ke login page
                 alert('Silakan login terlebih dahulu!');
                 window.location.href = 'login-page.html';
             } else {
-                // User sudah login, tampilkan nama dan lanjutkan load products
                 document.getElementById('userName').textContent = user.displayName || 'Pengguna';
                 loadProducts();
             }
         });
 
-        // Logout
         document.getElementById('logoutButton').addEventListener('click', () => {
             auth.signOut().then(() => {
                 localStorage.removeItem('userRole');
@@ -453,7 +353,6 @@
             });
         });
 
-        // Load products from Firebase
         async function loadProducts() {
             const productGrid = document.getElementById('productGrid');
             
@@ -472,7 +371,6 @@
                     productGrid.innerHTML += productCard;
                 });
                 
-                // Update cart count
                 updateCartCount();
             } catch (error) {
                 console.error('Error loading products:', error);
@@ -481,13 +379,18 @@
         }
 
         function createProductCard(id, product) {
-            // Potong deskripsi agar tidak terlalu panjang, maksimal 60 karakter
-            const shortDescription = (product.description || '').substring(0, 60) + '...';
+            // Menampilkan deskripsi LENGKAP tanpa pemotongan
+            const description = product.description || 'Tidak ada deskripsi tersedia untuk produk ini.';
+            
+            // Pastikan imageUrl selalu ada nilai valid
+            const imageUrl = product.imageUrl || 'https://via.placeholder.com/250';
 
             return `
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="${product.image || 'https://via.placeholder.com/250'}" alt="${product.name}" style="width:100%; height:100%; object-fit: cover;">
+                        <img src="${imageUrl}" 
+                             alt="${product.name}" 
+                             onerror="this.src='https://via.placeholder.com/250'">
                     </div>
                     <div class="product-info">
                         <div class="product-name">${product.name}</div>
@@ -495,9 +398,9 @@
                             <span>${product.category || 'Umum'}</span>
                             <span>Stok: <strong>${product.stock || 0}</strong></span>
                         </div>
-                        <p class="product-description">${shortDescription}</p>
+                        <p class="product-description">${description}</p>
                         <div class="product-price">Rp ${parseInt(product.price).toLocaleString('id-ID')}</div>
-                        <button class="btn-add-cart" onclick="window.addToCart(event, '${id}', '${product.name}', ${product.price}, '${product.image || ''}')">
+                        <button class="btn-add-cart" onclick="addToCartHandler('${id}', '${imageUrl}')">
                             Tambah ke Keranjang
                         </button>
                     </div>
@@ -505,28 +408,42 @@
             `;
         }
 
-        window.addToCart = function(event, productId, productName, price, imageUrl) {
-            event.stopPropagation();
-            
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const existingItem = cart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({
-                    id: productId,
-                    name: productName,
-                    price: price,
-                    quantity: 1,
-                    imageUrl: imageUrl
-                });
+        // Fungsi untuk menambah produk ke keranjang
+        window.addToCartHandler = async function(productId, imageUrl) {
+            try {
+                // Ambil data produk lengkap dari Firestore
+                const productDoc = await db.collection('products').doc(productId).get();
+                
+                if (!productDoc.exists) {
+                    alert('Produk tidak ditemukan');
+                    return;
+                }
+                
+                const product = productDoc.data();
+                
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const existingItem = cart.find(item => item.id === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        id: productId,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1,
+                        imageUrl: product.imageUrl || imageUrl || 'https://via.placeholder.com/250'
+                    });
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                
+                alert('Produk berhasil ditambahkan ke keranjang!');
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Gagal menambahkan produk ke keranjang');
             }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            
-            alert('Produk berhasil ditambahkan ke keranjang!');
         };
 
         function updateCartCount() {
@@ -534,12 +451,6 @@
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.getElementById('cartCount').textContent = totalItems;
         }
-
-        window.filterCategory = function(category) {
-            // This should ideally lead to a product listing page
-            alert(`Filter untuk kategori: ${category}`);
-        };
-
     </script>
 </body>
 </html>

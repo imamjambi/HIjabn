@@ -14,6 +14,8 @@ async function registerNewUser(email, password, userData) {
             email: email,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: db.app.firebase_.firestore.FieldValue.serverTimestamp(),
+            updatedAt: db.app.firebase_.firestore.FieldValue.serverTimestamp()
         });
         
         console.log('User registered successfully:', user.uid);

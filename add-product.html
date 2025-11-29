@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Produk Baru - Admin Hijabina</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Gaya tambahan untuk halaman tambah produk */
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        .form-container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #555;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box; /* Penting untuk padding */
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #5a67d8;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none; /* Sembunyikan secara default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-overlay" id="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="form-container">
+        <h1>Tambah Produk Baru</h1>
+        <form id="addProductForm">
+            <div class="form-group">
+                <label for="productName">Nama Produk</label>
+                <input type="text" id="productName" required>
+            </div>
+            <div class="form-group">
+                <label for="productCategory">Kategori</label>
+                <input type="text" id="productCategory" required>
+            </div>
+            <div class="form-group">
+                <label for="productPrice">Harga (Rp)</label>
+                <input type="number" id="productPrice" required>
+            </div>
+            <div class="form-group">
+                <label for="productStock">Stok</label>
+                <input type="number" id="productStock" required>
+            </div>
+            <div class="form-group">
+                <label for="productDescription">Deskripsi Produk</label>
+                <textarea id="productDescription" placeholder="Jelaskan detail produk, bahan, ukuran, dll."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="productImage">URL Gambar Produk</label>
+                <input type="url" id="productImage" placeholder="assets\images\gambar4.jpg" required>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan Produk</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- Your Scripts -->
+    <script type="module" src="js/add-product.js"></script>
+</body>
+</html>

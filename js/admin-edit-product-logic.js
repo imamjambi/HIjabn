@@ -1,5 +1,10 @@
 // d:/HIJABINA/js/admin-edit-product-logic.js
 
+// PENTING: Impor firebase/app agar objek 'firebase' tersedia untuk timestamp
+// DAN impor firebase/firestore agar FieldValue tersedia
+import 'https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js';
+// Impor firestore agar objek firebase.firestore.FieldValue tersedia
+import 'https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js';
 import { db } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('productDescription').value = product.description || '';
                 
                 // Isi input path gambar dengan path yang ada
-                imagePathInput.value = product.image || '';
+                imagePathInput.value = product.imageUrl || '';
 
             } else {
                 showAlert('Produk tidak ditemukan di database.', 'error');
@@ -72,8 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 price: parseFloat(document.getElementById('productPrice').value),
                 stock: parseInt(document.getElementById('productStock').value, 10),
                 description: document.getElementById('productDescription').value,
-                image: newImageUrl, // Simpan path lengkap yang baru
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                imageUrl: newImageUrl, // Simpan path lengkap yang baru
+                updatedAt: db.app.firebase_.firestore.FieldValue.serverTimestamp(),
             };
 
             // Update dokumen di Firestore
@@ -82,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showAlert('✅ Produk berhasil diperbarui!', 'success');
 
             setTimeout(() => {
-                window.location.href = 'admin-dashboard.html#products-section';
+                window.location.href = 'index.html#products';
             }, 2000);
 
         } catch (error) {

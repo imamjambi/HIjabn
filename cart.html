@@ -3,48 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang Belanja - Toko Hijabina</title>
-    <link rel="stylesheet" href="css/style.css"> <!-- Pastikan path CSS ini benar -->
+    <title>Keranjang Belanja - Hijabina</title>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Anda bisa menambahkan style khusus untuk halaman keranjang di sini */
-        .main-content { padding: 20px; max-width: 900px; margin: auto; }
-        .cart-item { display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 15px 0; }
-        .cart-item img { width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 8px; }
-        .cart-item-details { flex-grow: 1; }
-        .cart-item-actions { text-align: right; }
-        .cart-total { text-align: right; margin-top: 20px; font-size: 1.2em; font-weight: bold; }
-        .empty-cart { text-align: center; padding: 50px; color: #888; }
-        .btn-checkout { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; margin-top: 10px; }
-        .btn-checkout:hover { background-color: #218838; }
-        .remove-item-btn { color: #dc3545; cursor: pointer; font-size: 0.9em; }
+        /* Anda bisa memindahkan style ini ke file style.css utama */
+        .cart-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        .cart-item-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .cart-item-price {
+            font-size: 16px;
+            color: #5a67d8;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="main-content">
-        <div class="header">
-            <h1>Keranjang Belanja Anda</h1>
-            <a href="index.html" style="text-decoration: none;">&larr; Kembali Belanja</a>
-        </div>
-
+    <div class="cart-container">
+        <h1>Keranjang Belanja Anda</h1>
         <div id="cart-items-container">
-            <!-- Item keranjang akan dimuat di sini oleh JavaScript -->
-            <div class="empty-cart">
-                <p>🛒 Keranjang Anda masih kosong.</p>
-            </div>
+            <!-- Item keranjang akan ditampilkan di sini oleh JavaScript -->
         </div>
-
-        <div class="cart-total" id="cart-summary" style="display: none;">
-            <p>Total Harga: <span id="cart-total-price">Rp 0</span></p>
-            <button class="btn-checkout" id="checkout-btn">Lanjutkan ke Pembayaran</button>
+        <div id="cart-empty-message" style="display: none; text-align: center; padding: 40px 0;">
+            <p>Keranjang belanja Anda masih kosong.</p>
+            <a href="index.html" class="btn btn-primary">Mulai Belanja</a>
         </div>
     </div>
 
-    <!-- Firebase Scripts (jika diperlukan untuk checkout) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-    <!-- Your Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
+    <!-- Script untuk menampilkan item keranjang -->
     <script type="module" src="js/cart.js"></script>
 </body>
 </html>

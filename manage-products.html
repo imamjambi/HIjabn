@@ -82,11 +82,24 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
+
+        .help-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .help-text code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
     <div style="padding: 40px;">
-        <a href="admin-dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+        <a href="index.html" class="back-btn">← Kembali ke Dashboard</a>
         
         <div class="product-form-container">
             <div class="form-header">
@@ -128,13 +141,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="img">Path Gambar Produk *</label>
-                    <input type="text" id="img" placeholder="Path gambar (mis:assets/images/gambar3.jpg)" required>
+                    <label for="productImage">Path/URL Gambar Produk *</label>
+                    <input type="text" id="productImage" placeholder="assets/images/gambar4.jpg" required>
+                    <p class="help-text">⚠️ Gunakan forward slash <code>/</code> bukan backslash <code>\</code></p>
+                    <p class="help-text">Contoh: <code>assets/images/gambar1.jpg</code></p>
                 </div>
 
                 <div class="form-group">
                     <label for="desc">Deskripsi Produk *</label>
-                    <textarea id="desc" placeholder="📄 Deskripsi Produk" rows="5" required></textarea>
+                    <textarea id="desc" placeholder="Deskripsi Produk" rows="5" required></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">✨ Tambah Produk</button>
@@ -147,13 +162,9 @@
         </div>
     </div>
 
-    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    
-    <!-- Your Scripts -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/add-product-logic.js"></script>
 </body>
